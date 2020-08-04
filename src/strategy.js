@@ -26,7 +26,7 @@ class Strategy extends OAuth2Strategy {
       authorizationURL: `https://${warehouseName}/admin/oauth/authorize`,
       tokenURL: `https://${warehouseName}/admin/oauth/access_token`,
       profileURL: `https://${warehouseName}/admin/warehouse.json`,
-      userAgent: 'passport-things-factory',
+      userAgent: 'passport-things-factory-oauth2',
       customHeaders: {},
       scopeSeparator: ','
     })
@@ -74,9 +74,11 @@ class Strategy extends OAuth2Strategy {
   }
 
   authenticate(req, options) {
+    /* CONFIRM-ME 아래 로직 확인요.
     // If warehouse is defined
     // with authentication
-    if (!isUndefined(options.warehouse)) {
+
+    if ('warehouse' in options) {
       const warehouseName = this.normalizewarehouseName(options.warehouse)
 
       // update _oauth2 settings
@@ -84,6 +86,7 @@ class Strategy extends OAuth2Strategy {
       this._oauth2._accessTokenUrl = `https://${warehouseName}/admin/oauth/access_token`
       this._profileURL = `https://${warehouseName}/admin/warehouse.json`
     }
+    */
 
     // Call superclass
     return super.authenticate(req, options)
