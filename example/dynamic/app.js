@@ -55,7 +55,7 @@ passport.deserializeUser((id, done) => {
 app.use(passport.initialize())
 
 router.get('/', (req, res) => {
-  res.send('visit http://localhost:3000/auth/things-factory?warehouse=your-warehouse-name to begin the auth')
+  res.send('visit http://localhost:3002/auth/things-factory?warehouse=your-warehouse-name to begin the auth')
 })
 
 router.get('/auth/things-factory', (req, res, next) => {
@@ -68,9 +68,12 @@ router.get('/auth/things-factory', (req, res, next) => {
     `things-factory-${time}`,
     new ThingsFactoryStrategy(
       {
+        authorizationURL: `http://hanjin.things-factory.com:3000/admin/oauth/authorize`,
+        tokenURL: `http://hanjin.things-factory.com:3000/admin/oauth/access_token`,
+        profileURL: `http://hanjin.things-factory.com:3000/admin/warehouse.json`,
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: `http://localhost:3000/auth/things-factory/${time}`,
+        callbackURL: `http://localhost:3002/auth/things-factory/${time}`,
         warehouse: req.query.warehouse
       },
       (accessToken, refreshToken, profile, done) => {
@@ -117,6 +120,6 @@ router.get(
 
 app.use('/', router)
 
-app.listen(3000, () => {
-  console.log('server started at http://localhost:3000')
+app.listen(3002, () => {
+  console.log('server started at http://localhost:3002')
 })
