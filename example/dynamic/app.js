@@ -55,7 +55,9 @@ passport.deserializeUser((id, done) => {
 app.use(passport.initialize())
 
 router.get('/', (req, res) => {
-  res.send('visit http://localhost:3002/auth/things-factory?warehouse=your-warehouse-name to begin the auth')
+  res.send(
+    `visit ${req.protocol}://${req.get('host')}/auth/things-factory?warehouse=your-warehouse-name to begin the auth`
+  )
 })
 
 router.get('/auth/things-factory', (req, res, next) => {
@@ -73,10 +75,12 @@ router.get('/auth/things-factory', (req, res, next) => {
         profileURL: `http://hanjin.things-factory.com:3000/admin/warehouse.json`,
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: `http://localhost:3002/auth/things-factory/${time}`,
+        callbackURL: `${req.protocol}://${req.get('host')}/auth/things-factory/${time}`,
         warehouse: req.query.warehouse
       },
       (accessToken, refreshToken, profile, done) => {
+        console.log('accessToken response', accessToken, refreshToken, profile)
+
         findByEmail(profile.emails[0].value, (err, user) => {
           if (err) {
             return done(err)

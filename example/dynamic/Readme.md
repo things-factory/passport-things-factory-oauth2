@@ -14,7 +14,7 @@ cd example
 > `EMAIL` is your ThingsFactory Dev Warehouse (or regular warehouse) email address used to log in
 
 ```bash
-CLIENT_ID=123456 CLIENT_SECRET=abcdef EMAIL=xyz@domain.com node app
+CLIENT_ID=20143978290-1834 CLIENT_SECRET=abcdef EMAIL=admin@hatiolab.com node app
 ```
 
 3. Load <http://localhost/auth/things-factory> and follow the instructions.
