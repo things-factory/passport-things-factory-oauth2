@@ -70,9 +70,9 @@ router.get('/auth/things-factory', (req, res, next) => {
     `things-factory-${time}`,
     new ThingsFactoryStrategy(
       {
-        authorizationURL: `http://auth.things-factory.com:3000/admin/oauth/authorize`,
-        tokenURL: `http://auth.things-factory.com:3000/admin/oauth/access_token`,
-        profileURL: `http://auth.things-factory.com:3000/admin/warehouse.json`,
+        authorizationURL: `http://system.things-factory.com:3000/admin/oauth/authorize`,
+        tokenURL: `http://system.things-factory.com:3000/admin/oauth/access_token`,
+        profileURL: `http://system.things-factory.com:3000/admin/warehouse.json`,
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: `${req.protocol}://${req.get('host')}/auth/things-factory/${time}`,
@@ -92,7 +92,11 @@ router.get('/auth/things-factory', (req, res, next) => {
             })
           }
 
-          return done(null, user)
+          return done(null, {
+            ...user,
+            accessToken,
+            refreshToken
+          })
         })
       }
     )
