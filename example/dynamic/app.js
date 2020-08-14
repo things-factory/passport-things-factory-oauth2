@@ -6,10 +6,6 @@ const app = express()
 const passport = require('passport')
 const ThingsFactoryStrategy = require('../../lib').Strategy
 
-if (typeof process.env.EMAIL !== 'string') {
-  throw new Error('you need to specify EMAIL')
-}
-
 if (typeof process.env.CLIENT_ID !== 'string') {
   throw new Error('you need to specify CLIENT_ID')
 }
@@ -21,32 +17,21 @@ if (typeof process.env.CLIENT_SECRET !== 'string') {
 /* eslint new-cap: 0 */
 const router = express.Router()
 
-const users = [
-  { id: 1, email: 'nick@teelaunch.com' },
-  { id: 2, email: process.env.EMAIL }
+const applications = [
+  { id: 1, appKey: '42319800-24125432' },
+  { id: 2, appKey: process.env.CLIENT_ID }
 ]
 
 function findById(id, fn) {
   const idx = id - 1
-  if (users[idx]) {
-    fn(null, users[idx])
+  if (applications[idx]) {
+    fn(null, applications[idx])
   } else {
-    fn(new Error(`User ${id} does not exist`))
+    fn(new Error(`Application ${id} does not exist`))
   }
 }
 
-function findByEmail(email, fn) {
-  for (let i = 0, len = users.length; i < len; i++) {
-    const user = users[i]
-    if (user.email === email) {
-      return fn(null, user)
-    }
-  }
-
-  return fn(null, null)
-}
-
-passport.serializeUser((user, done) => done(null, user.id))
+passport.serializeUser((user, done) => done(null, user.application.appKey))
 
 passport.deserializeUser((id, done) => {
   findById(id, (err, user) => done(err, user))
@@ -55,14 +40,12 @@ passport.deserializeUser((id, done) => {
 app.use(passport.initialize())
 
 router.get('/', (req, res) => {
-  res.send(
-    `visit ${req.protocol}://${req.get('host')}/auth/things-factory?warehouse=your-warehouse-name to begin the auth`
-  )
+  res.send(`visit ${req.protocol}://${req.get('host')}/auth/things-factory?site=your-site-name to begin the auth`)
 })
 
 router.get('/auth/things-factory', (req, res, next) => {
-  if (typeof req.query.warehouse !== 'string') {
-    return res.send('req.query.warehouse was not a string, e.g. /auth/things-factory?warehouse=your-warehouse-name')
+  if (typeof req.query.site !== 'string') {
+    return res.send('req.query.site was not a string, e.g. /auth/things-factory?site=your-site-name')
   }
 
   const time = new Date().getTime()
@@ -70,40 +53,28 @@ router.get('/auth/things-factory', (req, res, next) => {
     `things-factory-${time}`,
     new ThingsFactoryStrategy(
       {
-        authorizationURL: `http://system.things-factory.com:3000/admin/oauth/authorize`,
-        tokenURL: `http://system.things-factory.com:3000/admin/oauth/access_token`,
-        profileURL: `http://system.things-factory.com:3000/admin/warehouse.json`,
+        authorizationURL: `http://system.things-factory.com:3000/admin/oauth2/authorize`,
+        tokenURL: `http://system.things-factory.com:3000/admin/oauth2/access_token`,
+        profileURL: `http://system.things-factory.com:3000/admin/oauth2/profile.json`,
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: `${req.protocol}://${req.get('host')}/auth/things-factory/${time}`,
-        warehouse: req.query.warehouse
+        site: req.query.site
       },
       (accessToken, refreshToken, profile, done) => {
         console.log('accessToken response', accessToken, refreshToken, profile)
 
-        findByEmail(profile.emails[0].value, (err, user) => {
-          if (err) {
-            return done(err)
-          }
-
-          if (!user) {
-            return done(null, false, {
-              message: `Unknown user with email ${profile.email}`
-            })
-          }
-
-          return done(null, {
-            ...user,
-            accessToken,
-            refreshToken
-          })
+        return done(null, {
+          ...profile,
+          accessToken,
+          refreshToken
         })
       }
     )
   )
   return passport.authenticate(`things-factory-${time}`, {
     scope: ['read_orders'],
-    warehouse: req.query.warehouse
+    site: req.query.site
   })(req, res, next)
 })
 

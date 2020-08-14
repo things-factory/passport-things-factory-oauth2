@@ -2,9 +2,9 @@
  * Module dependencies.
  */
 import { InternalOAuthError, Strategy as OAuth2Strategy } from 'passport-oauth2'
-import { isUndefined, defaults } from 'lodash'
+import { defaults } from 'lodash'
 
-const WAREHOUSE_NAME_SLUG = /^[a-z0-9-_]+$/i
+const SITE_NAME_SLUG = /^[a-z0-9-_]+$/i
 
 /*
  * Inherit `Strategy` from `OAuth2Strategy`.
@@ -12,20 +12,20 @@ const WAREHOUSE_NAME_SLUG = /^[a-z0-9-_]+$/i
 class Strategy extends OAuth2Strategy {
   constructor(options = {}, verify) {
     defaults(options, {
-      warehouse: 'example'
+      site: 'example'
     })
 
-    let warehouseName
-    if (options.warehouse.match(WAREHOUSE_NAME_SLUG)) {
-      warehouseName = `${options.warehouse}.things-factory.com`
+    let siteName
+    if (options.site.match(SITE_NAME_SLUG)) {
+      siteName = `${options.site}.things-factory.com`
     } else {
-      warehouseName = options.warehouse
+      siteName = options.site
     }
 
     defaults(options, {
-      authorizationURL: `https://${warehouseName}/admin/oauth/authorize`,
-      tokenURL: `https://${warehouseName}/admin/oauth/access_token`,
-      profileURL: `https://${warehouseName}/admin/warehouse.json`,
+      authorizationURL: `https://${siteName}/admin/oauth2/authorize`,
+      tokenURL: `https://${siteName}/admin/oauth2/access_token`,
+      profileURL: `https://${siteName}/admin/oauth2/profile.json`,
       userAgent: 'passport-things-factory-oauth2',
       customHeaders: {},
       scopeSeparator: ','
@@ -52,21 +52,7 @@ class Strategy extends OAuth2Strategy {
 
       try {
         const json = JSON.parse(body)
-        const profile = {
-          provider: 'things-factory'
-        }
-        profile.id = json.warehouse.id
-        profile.displayName = json.warehouse.warehouse_owner
-        profile.username = json.warehouse.name
-        profile.profileURL = json.warehouse.domain
-        profile.emails = [
-          {
-            value: json.warehouse.email
-          }
-        ]
-        profile._raw = body
-        profile._json = json
-        return done(null, profile)
+        return done(null, json.profile)
       } catch (e) {
         return done(e)
       }
@@ -75,16 +61,16 @@ class Strategy extends OAuth2Strategy {
 
   authenticate(req, options) {
     /* CONFIRM-ME 아래 로직 확인요.
-    // If warehouse is defined
+    // If site is defined
     // with authentication
 
-    if ('warehouse' in options) {
-      const warehouseName = this.normalizewarehouseName(options.warehouse)
+    if ('site' in options) {
+      const siteName = this.normalizesiteName(options.site)
 
       // update _oauth2 settings
-      this._oauth2._authorizeUrl = `https://${warehouseName}/admin/oauth/authorize`
-      this._oauth2._accessTokenUrl = `https://${warehouseName}/admin/oauth/access_token`
-      this._profileURL = `https://${warehouseName}/admin/warehouse.json`
+      this._oauth2._authorizeUrl = `https://${siteName}/admin/oauth2/authorize`
+      this._oauth2._accessTokenUrl = `https://${siteName}/admin/oauth2/access_token`
+      this._profileURL = `https://${siteName}/admin/oauth2/profile.json`
     }
     */
 
@@ -92,12 +78,12 @@ class Strategy extends OAuth2Strategy {
     return super.authenticate(req, options)
   }
 
-  normalizewarehouseName(warehouse) {
-    if (warehouse.match(WAREHOUSE_NAME_SLUG)) {
-      return `${warehouse}.things-factory.com`
+  normalizesiteName(site) {
+    if (site.match(SITE_NAME_SLUG)) {
+      return `${site}.things-factory.com`
     }
 
-    return warehouse
+    return site
   }
 }
 

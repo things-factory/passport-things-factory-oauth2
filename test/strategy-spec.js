@@ -24,7 +24,7 @@ describe('ThingsFactoryStrategy', () => {
     })
 
     it('should have default user agent', () => {
-      expect(strategy._oauth2._customHeaders['User-Agent']).to.equal('passport-things-factory')
+      expect(strategy._oauth2._customHeaders['User-Agent']).to.equal('passport-things-factory-oauth2')
     })
   })
 
@@ -98,11 +98,25 @@ describe('ThingsFactoryStrategy', () => {
         () => {}
       )
 
-      const body = `{ "warehouse": { "name": "octocat", "id": 1,
-        "warehouse_owner": "monalisa octocat", "email": "octocat@things-factory.com",
-        "domain": "https://things-factory.com/octocat" } }`
+      const body = `{ 
+        "profile": {
+          "name": "Operato MMS",
+          "description": null,
+          "email": "20143978290-1834@system",
+          "type": "application",
+          "domain": {
+            "name": "SYSTEM",
+            "subdomain": "system",
+            "brandName": null,
+            "brandImage": null,
+            "contentImage": null,
+            "timezone": null
+          },
+          "application": { "appKey": "20143978290-1834" }
+        }
+      }`
       nock('https://example.things-factory.com')
-        .get('/admin/warehouse.json')
+        .get('/admin/oauth2/profile.json')
         .query({
           access_token: 'access-token'
         })
@@ -124,34 +138,8 @@ describe('ThingsFactoryStrategy', () => {
             return done(err)
           }
 
-          expect(profile.provider).to.equal('things-factory')
-          expect(profile.id).to.equal(1)
-          expect(profile.username).to.equal('octocat')
-          expect(profile.displayName).to.equal('monalisa octocat')
-          expect(profile.emails).to.have.lengthOf(1)
-          expect(profile.profileURL).to.equal('https://things-factory.com/octocat')
-          return done()
-        })
-      })
-
-      it('should set raw property', done => {
-        strategy.userProfile('access-token', (err, profile) => {
-          if (err) {
-            return done(err)
-          }
-
-          expect(profile._raw).to.be.a('string')
-          return done()
-        })
-      })
-
-      it('should set json property', done => {
-        strategy.userProfile('access-token', (err, profile) => {
-          if (err) {
-            return done(err)
-          }
-
-          expect(profile._json).to.be.instanceof(Object)
+          expect(profile.name).to.equal('Operato MMS')
+          expect(profile.type).to.equal('application')
           return done()
         })
       })
@@ -170,9 +158,23 @@ describe('ThingsFactoryStrategy', () => {
         () => {}
       )
 
-      const body = `{ "warehouse": { "name": "octocat", "id": 1,
-        "warehouse_owner": "monalisa octocat", "email": "octocat@things-factory.com",
-        "domain": "https://things-factory.com/octocat" } }`
+      const body = `{
+        "profile": {
+          "name": "Operato MMS",
+          "description": null,
+          "email": "20143978290-1834@system",
+          "type": "application",
+          "domain": {
+            "name": "SYSTEM",
+            "subdomain": "system",
+            "brandName": null,
+            "brandImage": null,
+            "contentImage": null,
+            "timezone": null
+          },
+          "application": { "appKey": "20143978290-1834" }
+        }
+      }`
 
       nock('https://things-factory.corpDomain/api/v3')
         .get('/user')
@@ -197,35 +199,8 @@ describe('ThingsFactoryStrategy', () => {
             return done(err)
           }
 
-          expect(profile.provider).to.equal('things-factory')
-          expect(profile.id).to.equal(1)
-          expect(profile.username).to.equal('octocat')
-          expect(profile.displayName).to.equal('monalisa octocat')
-          expect(profile.emails).to.have.lengthOf(1)
-          expect(profile.emails[0].value).to.equal('octocat@things-factory.com')
-          expect(profile.profileURL).to.equal('https://things-factory.com/octocat')
-          return done()
-        })
-      })
-
-      it('should set raw property', done => {
-        strategy.userProfile('access-token', (err, profile) => {
-          if (err) {
-            return done(err)
-          }
-
-          expect(profile._raw).to.be.a('string')
-          return done()
-        })
-      })
-
-      it('should set json property', done => {
-        strategy.userProfile('access-token', (err, profile) => {
-          if (err) {
-            return done(err)
-          }
-
-          expect(profile._json).to.be.an('object')
+          expect(profile.name).to.equal('Operato MMS')
+          expect(profile.type).to.equal('application')
           return done()
         })
       })
@@ -244,7 +219,7 @@ describe('ThingsFactoryStrategy', () => {
       )
 
       nock('https://example.things-factory.com')
-        .get('/admin/warehouse.json')
+        .get('/admin/oauth2/profile.json')
         .query({
           access_token: 'access-token'
         })

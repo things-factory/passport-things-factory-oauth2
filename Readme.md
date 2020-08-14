@@ -23,14 +23,14 @@ npm install -S passport-things-factory
 
 #### Configure Strategy
 
-**NOTE**: Unlike other OAuth2 passport strategies, this requires a specific `warehouse` if you want it to be dynamic.
+**NOTE**: Unlike other OAuth2 passport strategies, this requires a specific `site` if you want it to be dynamic.
 
 The ThingsFactory authentication strategy authenticates users using a ThingsFactory account
 and OAuth 2.0 tokens. The strategy requires a `verify` callback, which accepts
 these credentials and calls `done` providing a user, as well as `options`
 specifying a client ID, client secret, and callback URL.
 
-**Static Warehouse Name**:
+**Static site Name**:
 
 ```js
 passport.use(
@@ -38,19 +38,19 @@ passport.use(
     {
       clientID: THINGS_FACTORY_CLIENT_ID,
       clientSecret: THINGS_FACTORY_CLIENT_SECRET,
-      callbackURL: "http://127.0.0.1:3000/auth/things-factory/callback",
-      warehouse: THINGS_FACTORY_WAREHOUSE_SLUG, // e.g. my-warehouse-name.operato.com ... the `my-warehouse-name` part
+      callbackURL: 'http://127.0.0.1:3000/auth/things-factory/callback',
+      site: THINGS_FACTORY_site_SLUG // e.g. my-site-name.operato.com ... the `my-site-name` part
     },
     function (accessToken, refreshToken, profile, done) {
       User.findOrCreate({ thingsFactoryId: profile.id }, function (err, user) {
-        return done(err, user);
-      });
+        return done(err, user)
+      })
     }
   )
-);
+)
 ```
 
-**Dynamic Warehouse Name**:
+**Dynamic site Name**:
 
 See [example](https://github.com/danteata/passport-things-factory/tree/master/example/dynamic/) folder.
 
@@ -64,21 +64,21 @@ application:
 
 ```js
 app.get(
-  "/auth/things-factory",
-  passport.authenticate("things-factory", {
-    scope: ["read_products"],
-    warehouse: "warehouse-name",
+  '/auth/things-factory',
+  passport.authenticate('things-factory', {
+    scope: ['read_products'],
+    site: 'site-name'
   })
-);
+)
 
 app.get(
-  "/auth/things-factory/callback",
-  passport.authenticate("things-factory", { failureRedirect: "/login" }),
+  '/auth/things-factory/callback',
+  passport.authenticate('things-factory', { failureRedirect: '/login' }),
   function (req, res) {
     // Successful authentication, redirect home.
-    res.redirect("/");
+    res.redirect('/')
   }
-);
+)
 ```
 
 ## Examples
