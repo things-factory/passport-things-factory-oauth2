@@ -116,7 +116,7 @@ describe('ThingsFactoryStrategy', () => {
         }
       }`
       nock('https://example.things-factory.com')
-        .get('/admin/oauth2/profile.json')
+        .get('/admin/oauth/profile.json')
         .query({
           access_token: 'access-token'
         })
@@ -219,7 +219,7 @@ describe('ThingsFactoryStrategy', () => {
       )
 
       nock('https://example.things-factory.com')
-        .get('/admin/oauth2/profile.json')
+        .get('/admin/oauth/profile.json')
         .query({
           access_token: 'access-token'
         })

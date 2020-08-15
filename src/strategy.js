@@ -23,9 +23,9 @@ class Strategy extends OAuth2Strategy {
     }
 
     defaults(options, {
-      authorizationURL: `https://${siteName}/admin/oauth2/authorize`,
-      tokenURL: `https://${siteName}/admin/oauth2/access_token`,
-      profileURL: `https://${siteName}/admin/oauth2/profile.json`,
+      authorizationURL: `https://${siteName}/admin/oauth/authorize`,
+      tokenURL: `https://${siteName}/admin/oauth/access_token`,
+      profileURL: `https://${siteName}/admin/oauth/profile.json`,
       userAgent: 'passport-things-factory-oauth2',
       customHeaders: {},
       scopeSeparator: ','
@@ -68,9 +68,9 @@ class Strategy extends OAuth2Strategy {
       const siteName = this.normalizesiteName(options.site)
 
       // update _oauth2 settings
-      this._oauth2._authorizeUrl = `https://${siteName}/admin/oauth2/authorize`
-      this._oauth2._accessTokenUrl = `https://${siteName}/admin/oauth2/access_token`
-      this._profileURL = `https://${siteName}/admin/oauth2/profile.json`
+      this._oauth2._authorizeUrl = `https://${siteName}/admin/oauth/authorize`
+      this._oauth2._accessTokenUrl = `https://${siteName}/admin/oauth/access_token`
+      this._profileURL = `https://${siteName}/admin/oauth/profile.json`
     }
     */
 
