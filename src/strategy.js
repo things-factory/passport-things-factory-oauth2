@@ -4,28 +4,23 @@
 import { InternalOAuthError, Strategy as OAuth2Strategy } from 'passport-oauth2'
 import { defaults } from 'lodash'
 
-const SITE_NAME_SLUG = /^[a-z0-9-_]+$/i
-
 /*
  * Inherit `Strategy` from `OAuth2Strategy`.
  */
 class Strategy extends OAuth2Strategy {
   constructor(options = {}, verify) {
     defaults(options, {
-      site: 'example'
+      site: 'example',
+      siteBase: 'things-factory.com',
+      siteProtocol: 'https'
     })
 
-    let siteName
-    if (options.site.match(SITE_NAME_SLUG)) {
-      siteName = `${options.site}.things-factory.com`
-    } else {
-      siteName = options.site
-    }
+    let siteHost = `${options.siteProtocol}://${options.site}.${options.siteBase}`
 
     defaults(options, {
-      authorizationURL: `https://${siteName}/admin/oauth/authorize`,
-      tokenURL: `https://${siteName}/admin/oauth/access_token`,
-      profileURL: `https://${siteName}/admin/oauth/profile.json`,
+      authorizationURL: `${siteHost}/admin/oauth/authorize`,
+      tokenURL: `${siteHost}/admin/oauth/access_token`,
+      profileURL: `${siteHost}/admin/oauth/profile.json`,
       userAgent: 'passport-things-factory-oauth2',
       customHeaders: {},
       scopeSeparator: ','
@@ -57,33 +52,6 @@ class Strategy extends OAuth2Strategy {
         return done(e)
       }
     })
-  }
-
-  authenticate(req, options) {
-    /* CONFIRM-ME 아래 로직 확인요.
-    // If site is defined
-    // with authentication
-
-    if ('site' in options) {
-      const siteName = this.normalizesiteName(options.site)
-
-      // update _oauth2 settings
-      this._oauth2._authorizeUrl = `https://${siteName}/admin/oauth/authorize`
-      this._oauth2._accessTokenUrl = `https://${siteName}/admin/oauth/access_token`
-      this._profileURL = `https://${siteName}/admin/oauth/profile.json`
-    }
-    */
-
-    // Call superclass
-    return super.authenticate(req, options)
-  }
-
-  normalizesiteName(site) {
-    if (site.match(SITE_NAME_SLUG)) {
-      return `${site}.things-factory.com`
-    }
-
-    return site
   }
 }
 
