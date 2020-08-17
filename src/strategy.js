@@ -40,6 +40,11 @@ class Strategy extends OAuth2Strategy {
   }
 
   userProfile(accessToken, done) {
+    /*
+     * things-factory oauth2 방식은 AuthorizationHeader 방식과 QueryString 방식을 모두 지원하므로,
+     * 아래, this._oauth2.useAuthorizationHeaderforGET(true) 설정은 선택 사항이다.
+     */
+    this._oauth2.useAuthorizationHeaderforGET(true)
     this._oauth2.get(this._profileURL, accessToken, (err, body) => {
       if (err) {
         return done(new InternalOAuthError('Failed to fetch user profile', err))
